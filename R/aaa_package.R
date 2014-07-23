@@ -72,10 +72,9 @@
 #' }
 #'
 #' @name mobKriging
-#'
-#'
 #' @docType package
 NULL
+
 
 
 

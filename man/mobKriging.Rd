@@ -3,13 +3,26 @@
 \name{mobKriging}
 \alias{mobKriging}
 \alias{mobKriging-package}
-\title{Fit a mobKriging model.}
+\title{Recursive Partitioning of Kriging Models}
 \usage{
-mobKriging(formula, data, mob.control, km.control)
+mobKriging(obj, part, feat, data, mob.control = list(), km.control = list())
 }
 \arguments{
-\item{formula}{[\code{formula}]\cr
-The fitting formula}
+\item{obj}{[\code{formula} | character(1)]\cr
+Either the fitting formula or the name of the target variable.
+The formula looks like \code{y ~ s1 + ... + sn | x1 + .... xn}.
+s1 to sn are the splitting variables (probably categorical, but numerical
+ones could be in included, too), while x1 to xn are the numerical variables
+the for the kriging models in the terminal nodes of the tree.}
+
+\item{part}{[\code{character}]\cr
+The partitioning variables for the tree structure.
+Ignored if you pass a formula.}
+
+\item{feat}{[\code{data.frame}]\cr
+The modeling features passed to the kriging models in the terminal nodes.
+Data to fit the model.
+Ignored if you pass a formula.}
 
 \item{data}{[\code{data.frame}]\cr
 Data to fit the model.}
@@ -24,9 +37,9 @@ Further args passed to \code{control} in \code{\link[DiceKriging]{km}}.}
 [\code{\link[party]{BinaryTree}}].
 }
 \description{
-blaaaaaaaaaaaaaaa
-
 Recursive partitioning of Kriging Models.
+
+blaaaaaaaaaaaaaaa
 }
 \details{
 This package contains the ingredients needed to combine Kriging (\code{\link[DiceKriging]{km}} from package \pkg{DiceKriging})

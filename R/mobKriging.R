@@ -3,8 +3,19 @@
 #' @description
 #' blaaaaaaaaaaaaaaa
 #'
-#' @param formula [\code{formula}]\cr
-#'   The fitting formula
+#' @param obj [\code{formula} | character(1)]\cr
+#'   Either the fitting formula or the name of the target variable.
+#'   The formula looks like \code{y ~ s1 + ... + sn | x1 + .... xn}.
+#'   s1 to sn are the splitting variables (probably categorical, but numerical
+#'   ones could be in included, too), while x1 to xn are the numerical variables
+#'   the for the kriging models in the terminal nodes of the tree.
+#' @param part [\code{character}]\cr
+#'   The partitioning variables for the tree structure.
+#'   Ignored if you pass a formula.
+#' @param feat [\code{data.frame}]\cr
+#'   The modeling features passed to the kriging models in the terminal nodes.
+#'   Data to fit the model.
+#'   Ignored if you pass a formula.
 #' @param data [\code{data.frame}]\cr
 #'   Data to fit the model.
 #' @param mob.control [\code{list}]\cr
@@ -13,8 +24,29 @@
 #'   Further args passed to \code{control} in \code{\link[DiceKriging]{km}}.
 #' @return [\code{\link[party]{BinaryTree}}].
 #' @export
-mobKriging = function(formula, data, mob.control, km.control) {
-  model = mob(y ~ x1 + x2 | x1 + x2, data = data, model = kmModel,
+
+mobKriging= function(obj, part, feat, data, mob.control = list(), km.control = list()) {
+  assertDataFrame(data)
+  assertList(mob.control)
+  assertList(km.control)
+
+  UseMethod("mobKriging")
+}
+
+#' @export
+mobKriging.formula = function(obj, part, feat, data, mob.control, km.control) {
+  model = mob(obj, data = data, model = kmModel,
     control = mob.control)
   return(model)
 }
+
+#' @export
+mobKriging.character = function(obj, part, feat, data, mob.control, km.control) {
+  cns = colnames(data)
+  assertChoice(target, cns)
+  assertSubset(part, cns)
+  assertSubset(feat, cns)
+  f = as.formula(sprintf("%s ~ %s | %s", target, collapse(feat, "+"), collapse(part, "+")))
+  mobKriging(f, data, mob.control, km.control)
+}
+
