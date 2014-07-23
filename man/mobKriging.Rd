@@ -34,7 +34,7 @@ Further args passed to \code{control} in \code{\link[party]{mob}}.}
 Further args passed to \code{control} in \code{\link[DiceKriging]{km}}.}
 }
 \value{
-[\code{\link[party]{BinaryTree}}].
+[\code{\linkS4class{BinaryTree}}].
 }
 \description{
 Recursive partitioning of Kriging Models.

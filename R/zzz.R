@@ -1,6 +1,7 @@
+#' @import BBmisc
 #' @import checkmate
 #' @import DiceKriging
-#' @import party
+#' @importFrom party mob
 NULL
 
 

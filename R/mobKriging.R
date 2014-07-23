@@ -22,7 +22,7 @@
 #'   Further args passed to \code{control} in \code{\link[party]{mob}}.
 #' @param km.control [\code{list}]\cr
 #'   Further args passed to \code{control} in \code{\link[DiceKriging]{km}}.
-#' @return [\code{\link[party]{BinaryTree}}].
+#' @return [\code{\linkS4class{BinaryTree}}].
 #' @export
 
 mobKriging= function(obj, part, feat, data, mob.control = list(), km.control = list()) {
@@ -34,19 +34,19 @@ mobKriging= function(obj, part, feat, data, mob.control = list(), km.control = l
 }
 
 #' @export
-mobKriging.formula = function(obj, part, feat, data, mob.control, km.control) {
+mobKriging.formula = function(obj, part, feat, data, mob.control = list(), km.control= list()) {
   model = mob(obj, data = data, model = kmModel,
     control = mob.control)
   return(model)
 }
 
 #' @export
-mobKriging.character = function(obj, part, feat, data, mob.control, km.control) {
+mobKriging.character = function(obj, part, feat, data, mob.control = list(), km.control = list()) {
   cns = colnames(data)
-  assertChoice(target, cns)
+  assertChoice(obj, cns)
   assertSubset(part, cns)
   assertSubset(feat, cns)
-  f = as.formula(sprintf("%s ~ %s | %s", target, collapse(feat, "+"), collapse(part, "+")))
+  f = as.formula(sprintf("%s ~ %s | %s", obj, collapse(feat, "+"), collapse(part, "+")))
   mobKriging(f, data, mob.control, km.control)
 }
 
