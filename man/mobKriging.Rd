@@ -3,8 +3,29 @@
 \name{mobKriging}
 \alias{mobKriging}
 \alias{mobKriging-package}
-\title{Recursive Partitioning of Kriging Models}
+\title{Fit a mobKriging model.}
+\usage{
+mobKriging(formula, data, mob.control, km.control)
+}
+\arguments{
+\item{formula}{[\code{formula}]\cr
+The fitting formula}
+
+\item{data}{[\code{data.frame}]\cr
+Data to fit the model.}
+
+\item{mob.control}{[\code{list}]\cr
+Further args passed to \code{control} in \code{\link[party]{mob}}.}
+
+\item{km.control}{[\code{list}]\cr
+Further args passed to \code{control} in \code{\link[DiceKriging]{km}}.}
+}
+\value{
+[\code{\link[party]{BinaryTree}}].
+}
 \description{
+blaaaaaaaaaaaaaaa
+
 Recursive partitioning of Kriging Models.
 }
 \details{
