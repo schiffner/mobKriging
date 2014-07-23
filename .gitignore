@@ -1,0 +1,9 @@
+mobKriging.Rcheck
+mobKriging_*.tar.gz
+.Rproj.user
+*.Rproj
+.Rhistory
+html
+src/*.so
+src/*.o
+

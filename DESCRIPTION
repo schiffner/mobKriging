@@ -1,0 +1,22 @@
+Package: mobKriging
+Title: Recursive Partitioning of Kriging Models
+Maintainer: Julia Schiffner <schiffner@math.uni-duesseldorf.de>
+Author: Julia Schiffner, Bernd Bischl
+Depends:
+    R (>= 2.15.1),
+    modeltools
+Imports:
+    DiceKriging,
+    stats,
+    sandwich,
+    party
+Suggests:
+    testthat
+Description: Recursive Partitioning of Kriging models.
+License: GPL-2
+URL: https://github.com/schiffner/mobKriging
+BugReports: https://github.com/schiffner/mobKriging/issues
+Roxygen: list(wrap = FALSE)
+LazyData: yes
+ByteCompile: yes
+Version: 1.0
