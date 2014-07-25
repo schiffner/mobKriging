@@ -4,8 +4,10 @@
 #' @title Methods for \code{\link{kmModel}} Objects
 #'
 #'
-#' @param object An object of class \code{"kmModel"}.
-#' @param weights A vector of observation weights.
+#' @param object [\code{\link{kmModel}}] \cr
+#'    An object of class \code{"kmModel"} containing a fitted Kriging model.
+#' @param weights [\code{numeric}] \cr
+#'    A vector of observation weights.
 #' @param \dots Further arguments.
 #'
 #'
@@ -30,10 +32,6 @@ reweight.kmModel <- function (object, weights, ...) {
 
 
 
-# @param object An object of class \code{"kmModel"}.
-# @param \dots Further arguments.
-#'
-#'
 #' @return 
 #' \code{deviance}: The value of the deviance extracted from \code{object}.
 #'
@@ -64,8 +62,8 @@ deviance.kmModel <- function (object, ...) {
 
 
 
-#' @param x An object of class \code{"kmModel"}.
-# @param \dots Further arguments.
+#' @param x [\code{\link{kmModel}}] \cr
+#'    An object of class \code{"kmModel"} containing a fitted Kriging model.
 #'
 #'
 #' @return 
@@ -85,7 +83,7 @@ deviance.kmModel <- function (object, ...) {
 ## model@T: C = t(T) %*% T
 ## model@z: z = inv(t(T))*(y - F*beta), de-correlated residuals
 ## model@M: M = inv(t(t))*F, de-correlated experimental matrix
-## xx = backsolve(model@T, model@z): solves Txx = z -> xx = inv(T)z = inv(T)inv(t(T))(y-F*beta) = inv(C)(y-F*beta)
+## xx = backsolve(model@T, model@z): solves T*xx = z -> xx = inv(T)*z = inv(T)*inv(t(T))*(y-F*beta) = inv(C)*(y-F*beta)
 
 estfun.kmModel <- function(x, ...) {
 	model <- x$m
@@ -94,7 +92,7 @@ estfun.kmModel <- function(x, ...) {
 		stop("penlized MLE currently not implemented")
 	}
 
-	## trend parameters
+	#### trend parameters
 	if (model@known.param %in% c("None", "CovAndVar")) { ## possible values are "None", "All", "CovAndVar" and "Trend"
 		trend.derivative <- model@M * model@z
 		colnames(trend.derivative) <- colnames(model@F)
@@ -193,7 +191,7 @@ estfun.kmModel <- function(x, ...) {
 print(colSums(deriv))
     derivative <- matrix(0, length(x$weights), ncol(deriv))
     colnames(derivative) <- colnames(deriv)
-    derivative[x$weights == 1,] <- deriv
+    derivative[x$weights > 0,] <- deriv
 print(head(derivative))
 	return(derivative)
 }

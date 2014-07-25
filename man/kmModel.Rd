@@ -8,8 +8,7 @@
   ..@ dpp         :function (formula, data = list(), subset = NULL, na.action = NULL, frame = NULL, 
     enclos = sys.frame(sys.nframe()), other = list(), designMatrix = TRUE, 
     responseMatrix = TRUE, setHook = NULL, ...)  
-  ..@ fit         :function (object, weights = NULL, trend.formula = ~1, noise.var = NULL, 
-    ...)  
+  ..@ fit         :function (object, weights = NULL, noise.var = NULL, km.args = NULL, ...)  
   ..@ predict     :function (object, newdata = NULL, ...)  
   ..@ capabilities:Formal class 'StatModelCapabilities' [package "modeltools"] with 2 slots
   .. .. ..@ weights: logi FALSE
@@ -24,18 +23,11 @@ A class for an unfitted Kriging model.
 \details{
 \code{kmModel} is an object of class \code{\link[modeltools]{StatModel-class}} implemented in package \pkg{modeltools} that
 provides an infra-structure for an unfitted \code{\link[DiceKriging]{km}} model.
-
-The argument \code{trend.formula} of function \code{fit} equals the \code{formula} argument of \code{\link[DiceKriging]{km}}:
-An optional object of class \code{"formula"} specifying the linear trend of the kriging model (see lm).
-This formula should concern only the input variables, and not the output (response).
-If there is any, it is automatically dropped. In particular, no response transformation is available yet.
-The default is \code{~1}, which defines a constant trend.
-(Called \code{trend.formula} in order to avoid confusion with the \code{fromula} argument of \code{\link[party]{mob}}.)
 }
 \examples{
 if (require(DiceKriging)) {
-    d <- 2
-    x <- seq(0,1,length = 4)
+    d <- 2L
+    x <- seq(0, 1, length = 4L)
     design <- expand.grid(x1 = x, x2 = x)
     y <- apply(design, 1, branin)
     df <- data.frame(y = y, design)
@@ -43,20 +35,20 @@ if (require(DiceKriging)) {
     ## data pre-processing
     mf <- dpp(kmModel, y ~ ., data = df)
 
-    ## no trend (trend.formula = ~ 1)
-    m <- fit(kmModel, mf)
+    ## no trend (formula = ~ 1)
+    m1 <- fit(kmModel, mf)
     ## equivalent
-    m1 <- km(design = design, response = y)
+    m2 <- km(design = design, response = y)
 
-    ## linear trend (trend.formula = ~ x1 + x2)
-    m <- fit(kmModel, mf, trend.formula = ~ .)
+    ## linear trend (formula = ~ x1 + x2)
+    m1 <- fit(kmModel, mf, formula = ~ .)
     ## equivalent
-    m1 <- km(formula = ~ ., design = design, response = y)
+    m2 <- km(formula = ~ ., design = design, response = y)
 
     ## predictions
-    Predict(m, pred.type = "UK")
+    Predict(m1, pred.type = "UK")
     ## equivalent
-    predict(m1, newdata = design, type = "UK")
+    predict(m2, newdata = design, type = "UK")
 }
 }
 \references{
@@ -65,7 +57,7 @@ experiments by Kriging-based metamodeling and optimization.
 \emph{Journal of Statistical Software}, \bold{51(1)}, \url{http://www.jstatsoft.org/}.
 }
 \seealso{
-\code{\link[modeltools]{StatModel-class}}.
+\code{\link[modeltools]{StatModel-class}}, \code{\link[DiceKriging]{km}}.
 }
 \keyword{datasets}
 

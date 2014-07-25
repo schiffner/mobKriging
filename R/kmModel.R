@@ -4,18 +4,18 @@
 #' \code{kmModel} is an object of class \code{\link[modeltools]{StatModel-class}} implemented in package \pkg{modeltools} that
 #' provides an infra-structure for an unfitted \code{\link[DiceKriging]{km}} model.
 #'
-#' The argument \code{trend.formula} of function \code{fit} equals the \code{formula} argument of \code{\link[DiceKriging]{km}}:
-#' An optional object of class \code{"formula"} specifying the linear trend of the kriging model (see lm).
-#' This formula should concern only the input variables, and not the output (response).
-#' If there is any, it is automatically dropped. In particular, no response transformation is available yet.
-#' The default is \code{~1}, which defines a constant trend.
-#' (Called \code{trend.formula} in order to avoid confusion with the \code{fromula} argument of \code{\link[party]{mob}}.)
-#'
+# The argument \code{trend.formula} of function \code{fit} equals the \code{formula} argument of \code{\link[DiceKriging]{km}}:
+# An optional object of class \code{"formula"} specifying the linear trend of the kriging model (see lm).
+# This formula should concern only the input variables, and not the output (response).
+# If there is any, it is automatically dropped. In particular, no response transformation is available yet.
+# The default is \code{~1}, which defines a constant trend.
+# (Called \code{trend.formula} in order to avoid confusion with the \code{fromula} argument of \code{\link[party]{mob}}.)
+#
 #'
 #' @title \code{kmModel}
 #'
 #'
-#' @seealso \code{\link[modeltools]{StatModel-class}}.
+#' @seealso \code{\link[modeltools]{StatModel-class}}, \code{\link[DiceKriging]{km}}.
 #'
 #'
 #' @references 
@@ -26,8 +26,8 @@
 #'
 #' @examples
 #' if (require(DiceKriging)) {
-#'     d <- 2
-#'     x <- seq(0,1,length = 4)
+#'     d <- 2L
+#'     x <- seq(0, 1, length = 4L)
 #'     design <- expand.grid(x1 = x, x2 = x)
 #'     y <- apply(design, 1, branin)
 #'     df <- data.frame(y = y, design)
@@ -35,20 +35,20 @@
 #'     ## data pre-processing
 #'     mf <- dpp(kmModel, y ~ ., data = df) 
 #'
-#'     ## no trend (trend.formula = ~ 1)
-#'     m <- fit(kmModel, mf)
+#'     ## no trend (formula = ~ 1)
+#'     m1 <- fit(kmModel, mf)
 #'     ## equivalent
-#'     m1 <- km(design = design, response = y)
+#'     m2 <- km(design = design, response = y)
 #'
-#'     ## linear trend (trend.formula = ~ x1 + x2)
-#'     m <- fit(kmModel, mf, trend.formula = ~ .)
+#'     ## linear trend (formula = ~ x1 + x2)
+#'     m1 <- fit(kmModel, mf, formula = ~ .)
 #'     ## equivalent
-#'     m1 <- km(formula = ~ ., design = design, response = y)
+#'     m2 <- km(formula = ~ ., design = design, response = y)
 #'
 #'     ## predictions
-#'     Predict(m, pred.type = "UK")
+#'     Predict(m1, pred.type = "UK")
 #'     ## equivalent
-#'     predict(m1, newdata = design, type = "UK")
+#'     predict(m2, newdata = design, type = "UK")
 #' }
 #'
 #'
@@ -133,12 +133,22 @@ kmModel <- new("StatModel",
         		MEF <- na.action(MEF)
 			MEF
 		},
-	fit = function (object, weights = NULL, trend.formula = ~ 1, noise.var = NULL, ...) {
-    		if (is.null(weights)) {
-       			m <- km(formula = trend.formula, design = object@get("designMatrix"), response = object@get("responseMatrix"), noise.var = noise.var, optim.method = "BFGS", ...)
-    		} else {
-        		m <- km(formula = trend.formula, design = object@get("designMatrix")[weights > 0, , drop = FALSE], response = object@get("responseMatrix")[weights > 0], noise.var = noise.var[weights > 0], optim.method = "BFGS", ...)
-    		}
+	fit = function (object, weights = NULL, noise.var = NULL, km.args = NULL, ...) {
+			if (is.null(km.args)) {
+	    		if (is.null(weights)) {
+    	   			m <- km(design = object@get("designMatrix"), response = object@get("responseMatrix"), noise.var = noise.var, ...)
+    			} else {
+        			m <- km(design = object@get("designMatrix")[weights > 0, , drop = FALSE], response = object@get("responseMatrix")[weights > 0], noise.var = noise.var[weights > 0], ...)
+    			}
+			} else {
+	    		if (is.null(weights)) {
+    	   			m <- do.call("km", c(list(design = object@get("designMatrix"), response = object@get("responseMatrix")), km.args))
+    			} else {
+    				if (!is.null(km.args$noise.var))
+    					km.args$noise.var <- km.args$noise.var[weights > 0]
+    	   			m <- do.call("km", c(list(design = object@get("designMatrix")[weights > 0, , drop = FALSE], response = object@get("responseMatrix")[weights > 0]), km.args))
+    			}
+			}
     		if (!m@param.estim)
     			stop("no parameters estimated")
  			z <- list(m = m)
@@ -158,7 +168,7 @@ kmModel <- new("StatModel",
 				pred <- predict(object = z$m, newdata = dm, type = pred.type, ...)
 				return(pred)
     		}
-    		z$addargs <- list(trend.formula = trend.formula, ...)
+    		z$addargs <- list(noise.var = noise.var, km.args = km.args, ...)
     		z$ModelEnv <- object
     		z$statmodel <- kmModel
    		 	z

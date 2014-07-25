@@ -12,13 +12,16 @@
 \method{estfun}{kmModel}(x, ...)
 }
 \arguments{
-\item{object}{An object of class \code{"kmModel"}.}
+\item{object}{[\code{\link{kmModel}}] \cr
+An object of class \code{"kmModel"} containing a fitted Kriging model.}
 
-\item{weights}{A vector of observation weights.}
+\item{weights}{[\code{numeric}] \cr
+A vector of observation weights.}
 
 \item{\dots}{Further arguments.}
 
-\item{x}{An object of class \code{"kmModel"}.}
+\item{x}{[\code{\link{kmModel}}] \cr
+   An object of class \code{"kmModel"} containing a fitted Kriging model.}
 }
 \value{
 \code{reweight}: The re-weighted fitted \code{"kmModel"} object.
@@ -30,8 +33,6 @@
 }
 \description{
 Methods for \code{\link{kmModel}} objects.
-
-
 }
 \seealso{
 \code{\link[party]{reweight}}, \code{\link[stats]{deviance}}, \code{\link[sandwich]{estfun}},

@@ -5,14 +5,14 @@ Maintainer: Julia Schiffner <schiffner@math.uni-duesseldorf.de>
 Author: Julia Schiffner, Bernd Bischl
 Depends:
     R (>= 2.15.1),
-    modeltools
+    modeltools,
+    party
 Imports:
     BBmisc,
     checkmate,
     DiceKriging,
     stats,
-    sandwich,
-    party
+    sandwich
 Suggests:
     testthat
 License: GPL-2

@@ -10,22 +10,26 @@
 \method{fitted}{kmModel}(object, pred.type, ..., mob = TRUE)
 }
 \arguments{
-\item{object}{An object of class \code{"kmModel"}.}
+\item{object}{[\code{\link{kmModel}}] \cr
+An object of class \code{"kmModel"} containing the fitted Kriging model.}
 
-\item{newdata}{A \code{data.frame} of cases to be predicted.}
+\item{newdata}{[\code{data.frame}] \cr
+The cases to be predicted.}
 
-\item{pred.type}{Argument \code{type} of \code{\link[DiceKriging]{predict.km}}.
-A \code{character} string corresponding to the kriging family, to be chosen between simple kriging (\code{"SK"}), or universal kriging (\code{"UK"}).
+\item{pred.type}{[\code{character(1)}] \cr
+Argument \code{type} of \code{\link[DiceKriging]{predict.km}}.
+A \code{character} string corresponding to the kriging family, to be chosen between simple kriging (\code{"SK"}) or universal kriging (\code{"UK"}).
 (Called \code{pred.type} to avoid confusion with argument \code{type} of \code{\link[party]{predict.mob}}.)}
 
 \item{\dots}{Further arguments to \code{\link[DiceKriging]{predict.km}}.}
 
-\item{mob}{Logical. If \code{TRUE} the object returned by \code{\link[DiceKriging]{predict.km}} is a \code{data.frame} instead
+\item{mob}{[\code{logical(1)}] \cr
+   If \code{TRUE} the object returned by \code{\link[DiceKriging]{predict.km}} is a \code{data.frame} instead
    of a \code{list}.}
 }
 \value{
 See \code{\link[DiceKriging]{predict.km}}.
-A \code{list} (or \code{data.frame}) containing the Kriging mean (including the trend) and further vectors and matrices
+A \code{list} (or \code{data.frame}) containing at least the Kriging mean and trend
 computed at \code{newdata}.
 }
 \description{
