@@ -1,30 +1,18 @@
-#' A class for an unfitted Kriging model.
-#'
-#'
-#' \code{kmModel} is an object of class \code{\link[modeltools]{StatModel-class}} implemented in package \pkg{modeltools} that
-#' provides an infra-structure for an unfitted \code{\link[DiceKriging]{km}} model.
-#'
-# The argument \code{trend.formula} of function \code{fit} equals the \code{formula} argument of \code{\link[DiceKriging]{km}}:
-# An optional object of class \code{"formula"} specifying the linear trend of the kriging model (see lm).
-# This formula should concern only the input variables, and not the output (response).
-# If there is any, it is automatically dropped. In particular, no response transformation is available yet.
-# The default is \code{~1}, which defines a constant trend.
-# (Called \code{trend.formula} in order to avoid confusion with the \code{fromula} argument of \code{\link[party]{mob}}.)
-#
+#' An object of class \code{\linkS4class{StatModel}} that provides infra-structure for an unfitted Kriging model.
 #'
 #' @title \code{kmModel}
 #'
+#' @return Slot \code{fit} returns an object of class \code{kmModel}.
 #'
-#' @seealso \code{\link[modeltools]{StatModel-class}}, \code{\link[DiceKriging]{km}}.
-#'
+#' @seealso \code{\linkS4class{StatModel}}, \code{\link[DiceKriging]{km}}, \code{\link[modeltools]{Predict}}.
 #'
 #' @references 
 #' Roustant, O., Ginsbourger, D. and Deville, Y. (2012), DiceKriging, DiceOptim: Two R packages for the analysis of computer
 #' experiments by Kriging-based metamodeling and optimization.
 #' \emph{Journal of Statistical Software}, \bold{51(1)}, \url{http://www.jstatsoft.org/}.
 #'
-#'
 #' @examples
+#' ## We use the first example in the documentation of function km
 #' if (require(DiceKriging)) {
 #'     d <- 2L
 #'     x <- seq(0, 1, length = 4L)
@@ -32,31 +20,40 @@
 #'     y <- apply(design, 1, branin)
 #'     df <- data.frame(y = y, design)
 #'
-#'     ## data pre-processing
-#'     mf <- dpp(kmModel, y ~ ., data = df) 
-#'
-#'     ## no trend (formula = ~ 1)
+#'     ## Fitting the model using kmModel:
+#'     # data pre-processing
+#'     mf <- dpp(kmModel, y ~ ., data = df)
+#'     # no trend (formula = ~ 1)
 #'     m1 <- fit(kmModel, mf)
-#'     ## equivalent
-#'     m2 <- km(design = design, response = y)
-#'
-#'     ## linear trend (formula = ~ x1 + x2)
+#'     # linear trend (formula = ~ x1 + x2)
 #'     m1 <- fit(kmModel, mf, formula = ~ .)
-#'     ## equivalent
-#'     m2 <- km(formula = ~ ., design = design, response = y)
+#'     # predictions on the training data
+#'     # recommended: improved version of predict for models fitted with objects
+#'     # of class StatModel
+#'     Predict(m1, type = "UK")
+#'     # also possible
+#'     predict(m1, type = "UK")
 #'
-#'     ## predictions
-#'     Predict(m1, pred.type = "UK")
-#'     ## equivalent
+#'     ## This is equivalent to:
+#'     # no trend (formula = ~ 1)
+#'     m2 <- km(design = design, response = y)
+#'     # linear trend (formula = ~ x1 + x2)
+#'     m2 <- km(formula = ~ ., design = design, response = y)
+#'     # predictions on the training data
 #'     predict(m2, newdata = design, type = "UK")
+#'
+#'     ## extract information
+#'     coef(m1)
+#'     residuals(m1)
+#'     logLik(m1)
+#'
+#'     ## diagnostic plots
+#'     plot(m1)
 #' }
 #'
-#'
 #' @rdname kmModel
-#' 
+#' @aliases kmModel-class
 #'
-#' @import modeltools
-#' @import DiceKriging
 #' @export
 
 kmModel <- new("StatModel",
@@ -157,7 +154,7 @@ kmModel <- new("StatModel",
     		z$contrasts <- attr(object@get("designMatrix"), "contrasts")
     		z$terms <- attr(object@get("input"), "terms")
     		z$xlevels <- attr(object@get("designMatrix"), "xlevels")
-    		z$predict_response <- function(newdata = NULL, pred.type, ...) {
+    		z$predict_response <- function(newdata = NULL, ...) {
         		if (!is.null(newdata)) {
             		penv <- new.env()
             		object@set("input", data = newdata, env = penv)
@@ -165,7 +162,7 @@ kmModel <- new("StatModel",
         		} else {
             		dm <- object@get("designMatrix")
         		}
-				pred <- predict(object = z$m, newdata = dm, type = pred.type, ...)
+				pred <- predict(object = z$m, newdata = dm, ...)
 				return(pred)
     		}
     		z$addargs <- list(noise.var = noise.var, km.args = km.args, ...)

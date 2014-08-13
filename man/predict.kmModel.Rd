@@ -4,36 +4,44 @@
 \alias{predict.kmModel}
 \title{Predict a \code{\link{kmModel}}}
 \usage{
-\method{predict}{kmModel}(object, newdata = NULL, pred.type, ...,
-  mob = TRUE)
+\method{predict}{kmModel}(object, newdata = NULL, ...)
 
-\method{fitted}{kmModel}(object, pred.type, ..., mob = TRUE)
+\method{fitted}{kmModel}(object, ...)
 }
 \arguments{
 \item{object}{[\code{\link{kmModel}}] \cr
-An object of class \code{"kmModel"} containing the fitted Kriging model.}
+The fitted Kriging model.}
 
 \item{newdata}{[\code{data.frame}] \cr
 The cases to be predicted.}
 
-\item{pred.type}{[\code{character(1)}] \cr
-Argument \code{type} of \code{\link[DiceKriging]{predict.km}}.
-A \code{character} string corresponding to the kriging family, to be chosen between simple kriging (\code{"SK"}) or universal kriging (\code{"UK"}).
-(Called \code{pred.type} to avoid confusion with argument \code{type} of \code{\link[party]{predict.mob}}.)}
-
-\item{\dots}{Further arguments to \code{\link[DiceKriging]{predict.km}}.}
-
-\item{mob}{[\code{logical(1)}] \cr
-   If \code{TRUE} the object returned by \code{\link[DiceKriging]{predict.km}} is a \code{data.frame} instead
-   of a \code{list}.}
+\item{\dots}{Additional arguments to \code{\link[DiceKriging]{predict.km}}.}
 }
 \value{
 See \code{\link[DiceKriging]{predict.km}}.
-A \code{list} (or \code{data.frame}) containing at least the Kriging mean and trend
+A \code{list} containing at least the Kriging mean and trend
 computed at \code{newdata}.
 }
 \description{
-Predict a Kriging model.
+Predict a fitted Kriging model.
+}
+\examples{
+## We use the first example in the documentation of function km
+if (require(DiceKriging)) {
+    d <- 2L
+    x <- seq(0, 1, length = 4L)
+    design <- expand.grid(x1 = x, x2 = x)
+    y <- apply(design, 1, branin)
+    df <- data.frame(y = y, design)
+
+    ## fitting the model
+    mf <- dpp(kmModel, y ~ ., data = df)
+    m <- fit(kmModel, mf, formula = ~ .)
+
+    ## fitted values and prediction
+    fitted(m, type = "UK")
+    predict(m, type = "UK", se.compute = FALSE, light.return = TRUE)
+}
 }
 \references{
 Roustant, O., Ginsbourger, D. and Deville, Y. (2012), DiceKriging, DiceOptim: Two R packages for the analysis of computer
@@ -41,6 +49,6 @@ experiments by Kriging-based metamodeling and optimization.
 \emph{Journal of Statistical Software}, \bold{51(1)}, \url{http://www.jstatsoft.org/}.
 }
 \seealso{
-\code{\link[modeltools]{Predict}}, \code{\link[stats]{predict}}, \code{\link[DiceKriging]{predict.km}}.
+\code{\link[modeltools]{Predict}}, \code{\link[stats]{predict}}, \code{\link[DiceKriging]{predict.km}}, \code{\link{kmModel}}.
 }
 

@@ -1,6 +1,9 @@
 Package: mobKriging
 Title: Recursive Partitioning of Kriging Models
-Description: Recursive Partitioning of Kriging models.
+Description: mobKriging provides an interface for model-based recursive
+    partitioning (mob) of Kriging models. This allows to build segmented
+    Kriging models by computing decision trees where each terminal node is
+    associated with a fitted Kriging model.
 Maintainer: Julia Schiffner <schiffner@math.uni-duesseldorf.de>
 Author: Julia Schiffner, Bernd Bischl
 Depends:
@@ -10,9 +13,9 @@ Depends:
 Imports:
     BBmisc,
     checkmate,
-    DiceKriging,
     stats,
-    sandwich
+    sandwich,
+    DiceKriging
 Suggests:
     testthat
 License: GPL-2

@@ -27,7 +27,7 @@ test_that("mobKriging", {
 		set.seed(123)
 		m1 = mob(y ~ x1 + x2 | x1 + x2, data = df, model = kmModel, control = mob_control(objfun = deviance, minsplit = 30L, verbose = FALSE))
 		set.seed(123)
-		m2 = mobKriging(y ~ x1 + x2 | x1 + x2, data = df, mob.control = mob_control(objfun = deviance, minsplit = 30L, verbose = FALSE))
+		m2 = mobKriging(y ~ x1 + x2 | x1 + x2, data = df, control = mob_control(objfun = deviance, minsplit = 30L, verbose = FALSE))
 	})
 	expect_equivalent(m1, m2)
 	# expect_equal(m1, m2)	## call, addargs
@@ -37,7 +37,7 @@ test_that("mobKriging", {
 		set.seed(123)
 		m1 = mob(y ~ x1 + x2 | x1 + x2, data = df, model = kmModel, km.args = list(formula = ~ .), control = mob_control(objfun = deviance, minsplit = 30L, verbose = FALSE))
 		set.seed(123)
-		m2 = mobKriging(y ~ x1 + x2 | x1 + x2, data = df, km.args = list(formula = ~ .), mob.control = mob_control(objfun = deviance, minsplit = 30L, verbose = FALSE))
+		m2 = mobKriging(y ~ x1 + x2 | x1 + x2, data = df, km.args = list(formula = ~ .), control = mob_control(objfun = deviance, minsplit = 30L, verbose = FALSE))
 	})
 	expect_equivalent(m1, m2)
 	# expect_equal(m1, m2)	## call, addargs

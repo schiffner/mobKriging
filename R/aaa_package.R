@@ -1,21 +1,25 @@
-#' Recursive partitioning of Kriging Models.
-#'
-#'
-#' This package contains the ingredients needed to combine Kriging (\code{\link[DiceKriging]{km}} from package \pkg{DiceKriging})
-#' with model-based recursive partitioning (\code{\link[party]{mob}} from package \pkg{party}).
-#'
-#' \code{\link{kmModel}} is an object of class \code{\link[modeltools]{StatModel-class}} implemented in package \pkg{modeltools} that
-#' provides an infra-structure for an unfitted \code{\link[DiceKriging]{km}} model.
-#'
-#' Moreover, methods for \code{kmModel} objects (that contain an object of class \code{\link[DiceKriging]{km-class}})
-#' for the generic functions
-#' \code{\link[party]{reweight}}, \code{\link[stats]{deviance}}, \code{\link[sandwich]{estfun}}, and
-#' \code{\link[stats]{predict}} are provided.
-#'
-#'
 #' @title Recursive Partitioning of Kriging Models
 #'
+#' @description
+#' This package provides an interface for model-based recursive partitioning (\code{\link[party]{mob}} from package \pkg{party}) of
+#' Kriging models (\code{\link[DiceKriging]{km}} from package \pkg{DiceKriging}).
+#' The main functions are \code{\link{mobKriging}} and \code{\link{predictMobKriging}}.
+#' These allow to build segmented Kriging models by computing decision trees where each terminal node corresponds to a fitted Kriging model
+#' and making predictions based on those models.
+#' Partitioning of Kriging models can be particularly useful if the data contain numerical as well as categorical explanatory variables.
+#' Since Kriging normally requires numerical explanatory variables the categorical variables cannot be taken into account directly but
+#' can be used as partitioning variables in \code{\link{mobKriging}}.
+#' Package \pkg{mobKriging} also provides different plots, among others diagnostic plots, for fitted segmented Kriging models. 
 #'
+# mob Kriging provides \code{\link{kmModel}} (an object of class \code{\linkS4class{StatModel}} implemented in 
+# package \pkg{modeltools}) that offers an infra-structure for an unfitted \code{\link[DiceKriging]{km}} model.
+#
+# Moreover, methods for \code{\linkS4class{kmModel}} objects (that contain an object of class \code{\link[DiceKriging]{km-class}})
+# for the generic functions
+# \code{\link[party]{reweight}}, \code{\link[stats]{deviance}}, \code{\link[sandwich]{estfun}}, and
+# \code{\link[stats]{predict}} are provided.
+#
+#
 # @note
 # Note that when combining kriging with model-based recursive partitioning we have to deal with two different \code{formula} objects.
 #
@@ -42,7 +46,3 @@
 #' @name mobKriging-package
 #' @docType package
 NULL
-
-
-
-

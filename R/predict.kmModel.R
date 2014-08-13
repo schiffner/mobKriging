@@ -1,49 +1,66 @@
-#' Predict a Kriging model.
-#'
-#'
 #' @title Predict a \code{\link{kmModel}}
 #'
+#' @description Predict a fitted Kriging model.
 #'
 #' @param object [\code{\link{kmModel}}] \cr
-#'    An object of class \code{"kmModel"} containing the fitted Kriging model.
+#'    The fitted Kriging model.
 #' @param newdata [\code{data.frame}] \cr
 #'    The cases to be predicted.
-#' @param pred.type [\code{character(1)}] \cr
-#'    Argument \code{type} of \code{\link[DiceKriging]{predict.km}}.
-#'    A \code{character} string corresponding to the kriging family, to be chosen between simple kriging (\code{"SK"}) or universal kriging (\code{"UK"}).
-#'    (Called \code{pred.type} to avoid confusion with argument \code{type} of \code{\link[party]{predict.mob}}.)
-#' @param \dots Further arguments to \code{\link[DiceKriging]{predict.km}}.
-#' @param mob [\code{logical(1)}] \cr
-#'    If \code{TRUE} the object returned by \code{\link[DiceKriging]{predict.km}} is a \code{data.frame} instead
-#'    of a \code{list}.
-#'
+#' @param \dots Additional arguments to \code{\link[DiceKriging]{predict.km}}.
 #'
 #' @return
 #' See \code{\link[DiceKriging]{predict.km}}.
-#' A \code{list} (or \code{data.frame}) containing at least the Kriging mean and trend
+#' A \code{list} containing at least the Kriging mean and trend
 #' computed at \code{newdata}.
 #'
-#'
-#' @seealso \code{\link[modeltools]{Predict}}, \code{\link[stats]{predict}}, \code{\link[DiceKriging]{predict.km}}.
-#'
+#' @seealso \code{\link[modeltools]{Predict}}, \code{\link[stats]{predict}}, \code{\link[DiceKriging]{predict.km}}, \code{\link{kmModel}}.
 #'
 #' @references 
 #' Roustant, O., Ginsbourger, D. and Deville, Y. (2012), DiceKriging, DiceOptim: Two R packages for the analysis of computer
 #' experiments by Kriging-based metamodeling and optimization.
 #' \emph{Journal of Statistical Software}, \bold{51(1)}, \url{http://www.jstatsoft.org/}.
 #'
+#' @examples
+#' ## We use the first example in the documentation of function km
+#' if (require(DiceKriging)) {
+#'     d <- 2L
+#'     x <- seq(0, 1, length = 4L)
+#'     design <- expand.grid(x1 = x, x2 = x)
+#'     y <- apply(design, 1, branin)
+#'     df <- data.frame(y = y, design)
+#'
+#'     ## fitting the model
+#'     mf <- dpp(kmModel, y ~ ., data = df)
+#'     m <- fit(kmModel, mf, formula = ~ .)
+#'
+#'     ## fitted values and prediction
+#'     fitted(m, type = "UK")
+#'     predict(m, type = "UK", se.compute = FALSE, light.return = TRUE)
+#' }
+# predict(m, km.args = list(type = "UK"))
+# predict(m, km.args = list(type = "UK", se.compute = FALSE, light.return = TRUE))
 #'
 #' @rdname predict.kmModel
 #'
 #' @method predict kmModel
 #' @export
 
-predict.kmModel <- function(object, newdata = NULL, pred.type, ..., mob = TRUE) {
-	pred <- object$predict_response(newdata = newdata, pred.type, ...)
-	if (mob) {
+predict.kmModel <- function(object, newdata = NULL, ...) {
+	m <- match.call(expand.dots = TRUE)
+	km.args <- eval(m$km.args)
+	if (is.null(km.args)) {
+		pred <- object$predict_response(newdata = newdata, ...)
+	} else {
+		f <- object$predict_response
+		pred <- do.call("f", c(list(newdata = newdata), km.args))
+		if (!is.null(pred$c)) {
+			pred$c <- t(pred$c)
+			pred$Tinv.c <- t(pred$Tinv.c)
+		}
 		pred <- as.data.frame(pred)
-		pred <- lapply(seq_len(nrow(pred)), function(i) pred[i,, drop = FALSE])
-	}
+		# pred <- Map(f = function(x) pred[x,, drop = FALSE], seq_len(nrow(pred)))
+		pred <- lapply(seq_len(nrow(pred)), function(i) pred[i,, drop = FALSE])	
+	}	
 	pred
 }
 
@@ -51,14 +68,8 @@ predict.kmModel <- function(object, newdata = NULL, pred.type, ..., mob = TRUE) 
 
 #' @rdname predict.kmModel
 #'
-#'
 #' @export
 
-fitted.kmModel <- function(object, pred.type, ..., mob = TRUE) {
-	pred <- object$predict_response(newdata = NULL, pred.type, ...)
-	if (mob) {
-		pred <- as.data.frame(pred)
-		pred <- lapply(seq_len(nrow(pred)), function(i) pred[i,, drop = FALSE])
-	}
-	pred
+fitted.kmModel <- function(object, ...) {
+	predict.kmModel(object, newdata = NULL, ...)
 }

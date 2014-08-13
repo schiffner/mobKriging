@@ -26,7 +26,7 @@ test_that("kmModel", {
 	expect_equivalent(m1$m, m2)
 
 	## predictions
-	pred1 <- Predict(m1, pred.type = "UK")
+	pred1 <- Predict(m1, type = "UK")
 	pred2 <- predict(m2, newdata = design, type = "UK")
 	expect_equal(pred1, pred2)
 })

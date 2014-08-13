@@ -1,53 +1,41 @@
-#' Methods for \code{\link{kmModel}} objects.
-#'
-#'
 #' @title Methods for \code{\link{kmModel}} Objects
 #'
+#' @description Methods for \code{\link{kmModel}} objects.
 #'
-#' @param object [\code{\link{kmModel}}] \cr
-#'    An object of class \code{"kmModel"} containing a fitted Kriging model.
+#' @param object,x [\code{\linkS4class{kmModel}}] \cr
+#'    The fitted Kriging model.
 #' @param weights [\code{numeric}] \cr
 #'    A vector of observation weights.
 #' @param \dots Further arguments.
+#' 
+#' @seealso \code{\link[DiceKriging]{coef,km-method}}, \code{\link[stats]{deviance}}, \code{\link[sandwich]{estfun}}, \code{\link[stats]{logLik}}, 
+#' \code{\link[stats]{model.matrix}}, \code{\link[DiceKriging]{plot,km-method}}, \code{\link[DiceKriging]{show,km-method}},
+#' \code{\link[stats]{residuals}}, \code{\link[party]{reweight}}, \code{\link[DiceKriging]{km}}.
 #'
+# @rdname methods
+# @name methods
+
+
+
+#' @describeIn methods Coefficient values of a fitted \code{\linkS4class{km}} model, see \code{\link[DiceKriging]{coef,km-method}}.
 #'
-#' @return 
-#' \code{reweight}: The re-weighted fitted \code{"kmModel"} object. 
-#\cr
-#'
-#'
-#' @seealso \code{\link[party]{reweight}}, \code{\link[stats]{deviance}}, \code{\link[sandwich]{estfun}},
-#' \code{\link[DiceKriging]{km}}.
-#'
-#'
-#' @rdname reweight.kmModel
-#'
-#' @importFrom party reweight
+# @importFrom stats coef
+#' @method coef kmModel
 #' @export
 
-reweight.kmModel <- function (object, weights, ...) {
-	fit <- kmModel@fit
-	try(do.call("fit", c(list(object = object$ModelEnv, weights = weights), object$addargs)))
+coef.kmModel <- function(object, ...) {
+	return(DiceKriging::coef(object$m))
 }
 
 
 
-#' @return 
-#' \code{deviance}: The value of the deviance extracted from \code{object}.
-#'
-#'
-# @seealso \code{\link[party]{reweight}}, \code{\link[stats]{deviance}}, \code{\link[sandwich]{estfun}},
-# \code{\link[DiceKriging]{km}}.
-#'
-#'
-#' @rdname reweight.kmModel
+#' @describeIn methods The value of the deviance (log-likelihood times -2) extracted from \code{object}.
 #'
 #' @importFrom stats deviance
 #' @export
 
 deviance.kmModel <- function (object, ...) {
-	return(-object$m@logLik)
-	## final value of the concentrated log-likelihood, factor -1 since objective function is minimized
+	return(-2 * object$m@logLik)
 }
 
 
@@ -62,20 +50,8 @@ deviance.kmModel <- function (object, ...) {
 
 
 
-#' @param x [\code{\link{kmModel}}] \cr
-#'    An object of class \code{"kmModel"} containing a fitted Kriging model.
-#'
-#'
-#' @return 
-#' \code{estfun}: The empirical estimating (or score) function, i.e., the derivatives of the log-likelihood with respect
-#'   to the parameters, evaluated at the training data.
-#'
-#'
-# @seealso \code{\link[party]{reweight}}, \code{\link[stats]{deviance}}, \code{\link[sandwich]{estfun}},
-# \code{\link[DiceKriging]{km}}.
-#'
-#'
-#' @rdname reweight.kmModel
+#' @describeIn methods The empirical estimating (or score) function, i.e., the derivatives of the log-likelihood with respect
+#'        to the parameters, evaluated at the training data.
 #'
 #' @importFrom sandwich estfun
 #' @export
@@ -87,7 +63,7 @@ deviance.kmModel <- function (object, ...) {
 
 estfun.kmModel <- function(x, ...) {
 	model <- x$m
-	
+print(coef(model), digits = 15)	
 	if (identical(model@method, "PMLE")) {
 		stop("penlized MLE currently not implemented")
 	}
@@ -189,6 +165,7 @@ estfun.kmModel <- function(x, ...) {
     }
     deriv <- cbind(trend.derivative, cov.derivative)
 print(colSums(deriv))
+print(apply(deriv, 2, sd))
     derivative <- matrix(0, length(x$weights), ncol(deriv))
     colnames(derivative) <- colnames(deriv)
     derivative[x$weights > 0,] <- deriv
@@ -198,7 +175,42 @@ print(head(derivative))
 
 
 
-#' @noRd
+#' @describeIn methods Value of the concentrated log-likelihood at its optimum.
+#'
+#' @importFrom stats logLik
+#' @method logLik kmModel
+#' @export
+
+logLik.kmModel <- function(object, ...) {
+	object$m@logLik
+}
+
+
+
+#' @describeIn methods See \code{\link[stats]{model.matrix}}.
+#'
+#' @importFrom stats model.matrix
+#' @export
+
+model.matrix.kmModel <- function (object, ...) {
+	object$ModelEnv@get("designMatrix")
+}
+
+
+
+#' @describeIn methods Diagnostic plots, see \code{\link[DiceKriging]{plot,km-method}}.
+#'
+# @importFrom graphics plot
+#' @method plot kmModel
+#' @export
+
+plot.kmModel <- function(x, ...) {
+	plot(x$m)
+}
+
+
+
+#' @describeIn methods The main features of the fitted Kriging model. See \code{\link[DiceKriging]{show,km-method}}.
 #'
 #' @export
 
@@ -208,10 +220,28 @@ print.kmModel <- function(x, ...) {
 
 
 
-#' @noRd
+#' @describeIn methods The de-correlated residuals. Extractor function for slot \code{z} of \code{\linkS4class{km}}.
 #'
+#' @importFrom stats residuals
 #' @export
 
-model.matrix.kmModel <- function (object, ...) {
-	object$ModelEnv@get("designMatrix")
+residuals.kmModel <- function(object, ...) {
+	res <- list(decorrelated = object$m@z, original = as.vector(t(object$m@T) %*% object$m@z))
+	return(res)
 }
+
+
+
+#' @describeIn methods The re-weighted fitted \code{\linkS4class{kmModel}} object.
+#'
+#' @importFrom party reweight
+#' @export
+
+reweight.kmModel <- function (object, weights, ...) {
+	fit <- kmModel@fit
+	try(do.call("fit", c(list(object = object$ModelEnv, weights = weights), object$addargs)))
+}
+
+
+# weights
+# summary

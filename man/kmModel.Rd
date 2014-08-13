@@ -2,6 +2,7 @@
 \docType{data}
 \name{kmModel}
 \alias{kmModel}
+\alias{kmModel-class}
 \title{\code{kmModel}}
 \format{\preformatted{Formal class 'StatModel' [package "modeltools"] with 5 slots
   ..@ name        : chr "kriging model"
@@ -17,14 +18,14 @@
 \usage{
 kmModel
 }
-\description{
-A class for an unfitted Kriging model.
+\value{
+Slot \code{fit} returns an object of class \code{kmModel}.
 }
-\details{
-\code{kmModel} is an object of class \code{\link[modeltools]{StatModel-class}} implemented in package \pkg{modeltools} that
-provides an infra-structure for an unfitted \code{\link[DiceKriging]{km}} model.
+\description{
+An object of class \code{\linkS4class{StatModel}} that provides infra-structure for an unfitted Kriging model.
 }
 \examples{
+## We use the first example in the documentation of function km
 if (require(DiceKriging)) {
     d <- 2L
     x <- seq(0, 1, length = 4L)
@@ -32,23 +33,35 @@ if (require(DiceKriging)) {
     y <- apply(design, 1, branin)
     df <- data.frame(y = y, design)
 
-    ## data pre-processing
+    ## Fitting the model using kmModel:
+    # data pre-processing
     mf <- dpp(kmModel, y ~ ., data = df)
-
-    ## no trend (formula = ~ 1)
+    # no trend (formula = ~ 1)
     m1 <- fit(kmModel, mf)
-    ## equivalent
-    m2 <- km(design = design, response = y)
-
-    ## linear trend (formula = ~ x1 + x2)
+    # linear trend (formula = ~ x1 + x2)
     m1 <- fit(kmModel, mf, formula = ~ .)
-    ## equivalent
-    m2 <- km(formula = ~ ., design = design, response = y)
+    # predictions on the training data
+    # recommended: improved version of predict for models fitted with objects
+    # of class StatModel
+    Predict(m1, type = "UK")
+    # also possible
+    predict(m1, type = "UK")
 
-    ## predictions
-    Predict(m1, pred.type = "UK")
-    ## equivalent
+    ## This is equivalent to:
+    # no trend (formula = ~ 1)
+    m2 <- km(design = design, response = y)
+    # linear trend (formula = ~ x1 + x2)
+    m2 <- km(formula = ~ ., design = design, response = y)
+    # predictions on the training data
     predict(m2, newdata = design, type = "UK")
+
+    ## extract information
+    coef(m1)
+    residuals(m1)
+    logLik(m1)
+
+    ## diagnostic plots
+    plot(m1)
 }
 }
 \references{
@@ -57,7 +70,7 @@ experiments by Kriging-based metamodeling and optimization.
 \emph{Journal of Statistical Software}, \bold{51(1)}, \url{http://www.jstatsoft.org/}.
 }
 \seealso{
-\code{\link[modeltools]{StatModel-class}}, \code{\link[DiceKriging]{km}}.
+\code{\linkS4class{StatModel}}, \code{\link[DiceKriging]{km}}, \code{\link[modeltools]{Predict}}.
 }
 \keyword{datasets}
 
